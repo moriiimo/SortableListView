@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">SortableListView</string>
+    <string name="button_name">ボタン</string>
 </resources>

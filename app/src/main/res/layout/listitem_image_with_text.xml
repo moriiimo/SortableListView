@@ -44,12 +44,15 @@
 
     </LinearLayout>
 
-    <!-- アイコン -->
-    <ImageView
-        android:id="@+id/move_icon"
+    <!-- ソートボタン -->
+    <ImageButton
+        android:id="@+id/sort_button"
         style="@style/list_arrow"
-        android:contentDescription="@string/app_name"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:layout_marginRight="20dp"
+        android:contentDescription="@string/button_name"
         android:src="@mipmap/move_icon"
-        android:visibility="invisible" />
+        android:visibility="invisible"/>
 
 </LinearLayout>

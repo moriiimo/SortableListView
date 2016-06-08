@@ -4,17 +4,24 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.ImageLoader.ImageCache;
 import com.android.volley.toolbox.Volley;
 import com.example.moriiimo.sortablelistview.R;
-
 import com.example.moriiimo.sortablelistview.adapter.SampleAdapter;
 import com.example.moriiimo.sortablelistview.view.SortableListView;
 
 public class MainActivity extends AppCompatActivity {
+
+    private static final String TAG = MainActivity.class.getSimpleName();
 
     static final String[] PREFS = { "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県",
             "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県",
@@ -36,9 +43,23 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         mAdapter = new SampleAdapter(getLayoutInflater(), PREFS, mDraggingPosition, getImageLoader());
         mListView = (SortableListView) findViewById(R.id.list);
-        mListView.setDragListener(new DragListener());
-        mListView.setSortable(true);
-        mListView.setAdapter(mAdapter);
+        mListView.init(new DragListener(), true, mAdapter);
+        mListView.setOnItemClickListener(new SortButtonClickListener());
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuItem item = menu.add("edit mode icon");
+        item.setIcon(android.R.drawable.ic_menu_edit);
+        item.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        mAdapter.toggleEditMode();
+        mListView.invalidateViews();
+        return super.onOptionsItemSelected(item);
     }
 
     private RequestQueue getQueue() {
@@ -64,7 +85,14 @@ public class MainActivity extends AppCompatActivity {
         return mImageLoader;
     }
 
-    class DragListener extends SortableListView.SimpleDragListener {
+    private class SortButtonClickListener implements ListView.OnItemClickListener {
+        @Override
+        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            mListView.performItemClick(view, position, id);
+        }
+    }
+
+    private class DragListener implements SortableListView.DragListener {
         @Override
         public int onStartDrag(int position) {
             mDraggingPosition = position;
@@ -110,7 +138,8 @@ public class MainActivity extends AppCompatActivity {
             mDraggingPosition = -1;
             mAdapter.updateDraggingPosition(mDraggingPosition);
             mListView.invalidateViews();
-            return super.onStopDrag(positionFrom, positionTo);
+            return positionFrom != positionTo && positionFrom >= 0
+                    || positionTo >= 0;
         }
     }
 
