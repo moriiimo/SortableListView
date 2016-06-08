@@ -68,6 +68,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public int onStartDrag(int position) {
             mDraggingPosition = position;
+            mAdapter.updateDraggingPosition(mDraggingPosition);
             mListView.invalidateViews();
             return position;
         }
@@ -99,6 +100,7 @@ public class MainActivity extends AppCompatActivity {
                 PREFS[min] = data;
             }
             mDraggingPosition = positionTo;
+            mAdapter.updateDraggingPosition(mDraggingPosition);
             mListView.invalidateViews();
             return positionTo;
         }
@@ -106,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onStopDrag(int positionFrom, int positionTo) {
             mDraggingPosition = -1;
+            mAdapter.updateDraggingPosition(mDraggingPosition);
             mListView.invalidateViews();
             return super.onStopDrag(positionFrom, positionTo);
         }

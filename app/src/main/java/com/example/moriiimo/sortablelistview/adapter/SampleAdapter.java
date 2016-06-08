@@ -67,9 +67,12 @@ public class SampleAdapter extends BaseAdapter {
         vh.image.setImageUrl("http://tetoan.com/wp-content/uploads/2015/06/%E6%8F%A1%E6%89%8B%E3%81%A7%E3%81%8A%E9%87%91%E3%82%92%E3%82%82%E3%82%89%E3%81%86%E7%8C%AB.jpg", mImageLoader);
         vh.description.setText(String.format("%sの猫さん", mNames[position]));
         Log.e(TAG, mNames[position] + ";" + vh.title.getText() + ":" + mDraggingPosition);
-
-//        convertView.setVisibility(position == mDraggingPosition ? View.VISIBLE : View.INVISIBLE);
+        convertView.setVisibility(position == mDraggingPosition ? View.INVISIBLE : View.VISIBLE);
         return convertView;
+    }
+
+    public void updateDraggingPosition(int draggingPosition) {
+        mDraggingPosition = draggingPosition;
     }
 
     static class ViewHolder {

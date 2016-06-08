@@ -11,22 +11,22 @@
     <!-- 親BOX -->
     <style name="list_main_box">
         <item name="android:layout_width">fill_parent</item>
-        <item name="android:layout_height">120dip</item>
+        <item name="android:layout_height">100dp</item>
     </style>
 
     <!-- サムネイル親BOX -->
     <style name="list_thumb_box">
-        <item name="android:layout_width">88dip</item>
-        <item name="android:layout_height">120dip</item>
+        <item name="android:layout_width">88dp</item>
+        <item name="android:layout_height">120dp</item>
         <item name="android:gravity">center</item>
         <item name="android:layout_gravity">center_vertical</item>
     </style>
 
     <!-- 中央文字部分親BOX -->
     <style name="list_text_box">
-        <item name="android:layout_width">0dip</item>
+        <item name="android:layout_width">0dp</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:minHeight">3dip</item>
+        <item name="android:minHeight">3dp</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:layout_weight">1</item>
         <item name="android:orientation">vertical</item>
@@ -40,8 +40,8 @@
         <item name="android:layout_centerVertical">true</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:adjustViewBounds">true</item>
-        <item name="android:paddingLeft">5dip</item>
-        <item name="android:paddingRight">5dip</item>
+        <item name="android:paddingLeft">5dp</item>
+        <item name="android:paddingRight">5dp</item>
     </style>
 
     <!-- サムネイル -->
@@ -49,8 +49,8 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
         <item name="android:adjustViewBounds">true</item>
-        <item name="android:layout_marginRight">1dip</item>
-        <item name="android:layout_marginLeft">1dip</item>
+        <item name="android:layout_marginRight">1dp</item>
+        <item name="android:layout_marginLeft">1dp</item>
         <item name="android:layout_gravity">center</item>
         <item name="android:scaleType">fitCenter</item>
     </style>

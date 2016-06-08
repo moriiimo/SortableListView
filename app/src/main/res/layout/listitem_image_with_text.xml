@@ -44,10 +44,12 @@
 
     </LinearLayout>
 
-    <!-- 矢印 -->
+    <!-- アイコン -->
     <ImageView
         android:id="@+id/move_icon"
         style="@style/list_arrow"
-        android:contentDescription="@string/app_name"/>
+        android:contentDescription="@string/app_name"
+        android:src="@mipmap/move_icon"
+        android:visibility="invisible" />
 
 </LinearLayout>
