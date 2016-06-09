@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -41,10 +42,10 @@ public class MainActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mAdapter = new SampleAdapter(getLayoutInflater(), PREFS, mDraggingPosition, getImageLoader());
+        mAdapter = new SampleAdapter(getLayoutInflater(), PREFS, mDraggingPosition, getImageLoader(), new SortButtonClickListener());
         mListView = (SortableListView) findViewById(R.id.list);
-        mListView.init(new DragListener(), true, mAdapter);
-        mListView.setOnItemClickListener(new SortButtonClickListener());
+        mListView.init(new DragListener(), mAdapter);
+//        mListView.setOnTouchListener(new SortButtonClickListener());
     }
 
     @Override
@@ -57,7 +58,9 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        mAdapter.toggleEditMode();
+        mListView.setSortable(!mListView.getSortable());
+        // アダプタ側に編集モードの通知（ボタン出したりとか）
+        mAdapter.setEditMode(mListView.getSortable());
         mListView.invalidateViews();
         return super.onOptionsItemSelected(item);
     }
@@ -85,10 +88,12 @@ public class MainActivity extends AppCompatActivity {
         return mImageLoader;
     }
 
-    private class SortButtonClickListener implements ListView.OnItemClickListener {
+    private class SortButtonClickListener implements View.OnTouchListener {
         @Override
-        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            mListView.performItemClick(view, position, id);
+        public boolean onTouch(View v, MotionEvent event) {
+            Log.e(TAG, "aaaaaaaaaaaaaaaa");
+            mListView.setSortButtonImageTouched(true);
+            return false;
         }
     }
 

@@ -13,6 +13,7 @@
     <com.example.moriiimo.sortablelistview.view.SortableListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/list">
+        android:id="@+id/list"
+        android:listSelector="@android:color/transparent">
     </com.example.moriiimo.sortablelistview.view.SortableListView>
 </RelativeLayout>

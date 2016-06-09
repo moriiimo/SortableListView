@@ -45,7 +45,7 @@
     </LinearLayout>
 
     <!-- ソートボタン -->
-    <ImageButton
+    <ImageView
         android:id="@+id/sort_button"
         style="@style/list_arrow"
         android:layout_width="50dp"

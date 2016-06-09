@@ -22,7 +22,7 @@ import android.widget.ListView;
  * via http://qiita.com/amay077/items/9f63e28db754fddb2aba
  * Created by moriiimo on 2016/06/07.
  */
-public class SortableListView extends ListView implements AdapterView.OnItemLongClickListener {
+public class SortableListView extends ListView {
 
     private static final String TAG = SortableListView.class.getSimpleName();
 
@@ -32,6 +32,8 @@ public class SortableListView extends ListView implements AdapterView.OnItemLong
 
     private boolean mSortable;
     private boolean mDragging;
+    private boolean mSortButtonImageTouched;
+
     private DragListener mDragListener;
     private int mBitmapBackgroundColor = Color.argb(128, 0xFF, 0xFF, 0xFF);
     private Bitmap mDragBitmap;
@@ -52,11 +54,11 @@ public class SortableListView extends ListView implements AdapterView.OnItemLong
         super(context, attrs, defStyleAttr);
     }
 
-    public void init(DragListener listener, boolean sortable, ListAdapter adapter) {
-        setOnItemLongClickListener(this);
-        setSortable(sortable);
+    public void init(DragListener listener, ListAdapter adapter) {
+//        setOnItemLongClickListener(this);
+//        setOnItemClickListener(this);
         setDragListener(listener);
-        this.setAdapter(adapter);
+        setAdapter(adapter);
     }
 
     /**
@@ -69,7 +71,9 @@ public class SortableListView extends ListView implements AdapterView.OnItemLong
         }
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {
+                Log.e(TAG, "action down " + event.getX() + ":" + event.getY());
                 storeMotionEvent(event);
+                startDrag();
                 break;
             }
             case MotionEvent.ACTION_MOVE: {
@@ -79,6 +83,7 @@ public class SortableListView extends ListView implements AdapterView.OnItemLong
                 break;
             }
             case MotionEvent.ACTION_UP: {
+                Log.e(TAG, "action_up");
                 if (stopDrag(event, true)) {
                     return true;
                 }
@@ -104,17 +109,21 @@ public class SortableListView extends ListView implements AdapterView.OnItemLong
 //     */
 //    @Override
 //    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//        Log.e(TAG, "tap:" + position);
+//        Log.e(TAG, "taaaaaaaaaaaaaaap:" + position);
+//        Log.e(TAG, "taaaaaaaaaaaaaaap:" + position);
+//        Log.e(TAG, "taaaaaaaaaaaaaaap:" + position);
+////        startDrag();
 //    }
 
-    /**
-     * リスト要素長押しイベント処理
-     */
-    @Override
-    public boolean onItemLongClick(AdapterView<?> parent, View view,
-                                   int position, long id) {
-        return startDrag();
-    }
+
+//    /**
+//     * リスト要素長押しイベント処理
+//     */
+//    @Override
+//    public boolean onItemLongClick(AdapterView<?> parent, View view,
+//                                   int position, long id) {
+//        return startDrag();
+//    }
 
     /**
      * ACTION_DOWN 時の MotionEvent をプロパティに格納
@@ -135,6 +144,12 @@ public class SortableListView extends ListView implements AdapterView.OnItemLong
         if (mPositionFrom < 0) {
             return false;
         }
+
+        // タップした位置がボタン画像のあたりではない場合はドラッグ中と判定しない
+        if (!mSortButtonImageTouched) {
+            return false;
+        }
+
         mDragging = true;
 
         // View, Canvas, WindowManager の取得・生成
@@ -235,10 +250,17 @@ public class SortableListView extends ListView implements AdapterView.OnItemLong
         if (!mDragging) {
             return false;
         }
+
+        if (mSortButtonImageTouched) {
+            setSortButtonImageTouched(false);
+        }
+
         if (isDrop && mDragListener != null) {
             mDragListener.onStopDrag(mPositionFrom, eventToPosition(event));
         }
+
         mDragging = false;
+
         if (mDragImageView != null) {
             getWindowManager().removeView(mDragImageView);
             mDragImageView = null;
@@ -252,6 +274,7 @@ public class SortableListView extends ListView implements AdapterView.OnItemLong
             mActionDownEvent = null;
             return true;
         }
+
         return false;
     }
 
@@ -313,7 +336,11 @@ public class SortableListView extends ListView implements AdapterView.OnItemLong
      * ソートモードのセット
      */
     public void setSortable(boolean sortable) {
-        this.mSortable = sortable;
+        mSortable = sortable;
+    }
+
+    public void setSortButtonImageTouched(boolean sortButtonImageTouched) {
+        mSortButtonImageTouched = sortButtonImageTouched;
     }
 
     /**
