@@ -2,20 +2,15 @@ package com.example.moriiimo.sortablelistview.adapter;
 
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
-import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.android.volley.toolbox.ImageLoader;
 import com.android.volley.toolbox.NetworkImageView;
 import com.example.moriiimo.sortablelistview.R;
-import com.example.moriiimo.sortablelistview.view.SortableListView;
 
 /**
  * SampleAdapter
@@ -31,7 +26,7 @@ public class SampleAdapter extends BaseAdapter {
     private int mDraggingPosition;
     private ImageLoader mImageLoader;
 
-    private boolean mEditMode;
+    private boolean mSortable;
     private View.OnTouchListener mOnTouchListener;
 
     public SampleAdapter(LayoutInflater inflater, String[] names, int draggingPosition, ImageLoader imageLoader, View.OnTouchListener listener) {
@@ -68,8 +63,8 @@ public class SampleAdapter extends BaseAdapter {
             vh.title = (TextView) convertView.findViewById(R.id.title_text);
             vh.image = (NetworkImageView) convertView.findViewById(R.id.list_image);
             vh.description = (TextView) convertView.findViewById(R.id.description);
-            vh.sortImageView = (ImageView) convertView.findViewById(R.id.sort_button);
-            vh.sortImageView.setOnTouchListener(mOnTouchListener);
+            vh.sortButtonImage = (ImageView) convertView.findViewById(R.id.sort_button_image);
+            vh.sortButtonImage.setOnTouchListener(mOnTouchListener);
             convertView.setTag(vh);
         } else {
             vh = (ViewHolder) convertView.getTag();
@@ -78,28 +73,24 @@ public class SampleAdapter extends BaseAdapter {
         vh.title.setText(mNames[position]);
         vh.image.setImageUrl("http://tetoan.com/wp-content/uploads/2015/06/%E6%8F%A1%E6%89%8B%E3%81%A7%E3%81%8A%E9%87%91%E3%82%92%E3%82%82%E3%82%89%E3%81%86%E7%8C%AB.jpg", mImageLoader);
         vh.description.setText(String.format("%sの猫さん", mNames[position]));
-        vh.sortImageView.setVisibility(mEditMode ? View.VISIBLE : View.INVISIBLE);
+        vh.sortButtonImage.setVisibility(mSortable ? View.VISIBLE : View.INVISIBLE);
         Log.e(TAG, mNames[position] + ";" + vh.title.getText() + ":" + mDraggingPosition);
         convertView.setVisibility(position == mDraggingPosition ? View.INVISIBLE : View.VISIBLE);
         return convertView;
     }
 
-    /**
-     * Adapter内のmDraggingPositionのアップデートをする
-     * @param draggingPosition
-     */
-    public void updateDraggingPosition(int draggingPosition) {
+    public void setDraggingPosition(int draggingPosition) {
         mDraggingPosition = draggingPosition;
     }
 
-    public void setEditMode(boolean editMode) {
-        mEditMode = editMode;
+    public void setSortable(boolean sortable) {
+        mSortable = sortable;
     }
 
     static class ViewHolder {
         private NetworkImageView image;
         private TextView title;
         private TextView description;
-        private ImageView sortImageView;
+        private ImageView sortButtonImage;
     }
 }

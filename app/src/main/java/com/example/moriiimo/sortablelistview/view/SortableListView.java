@@ -99,32 +99,6 @@ public class SortableListView extends ListView {
         }
         return super.onTouchEvent(event);
     }
-
-//    /**
-//     * ソートボタンタップ処理（セルじゃなくてボタンタップを取りたい）
-//     * @param parent
-//     * @param view
-//     * @param position
-//     * @param id
-//     */
-//    @Override
-//    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//        Log.e(TAG, "taaaaaaaaaaaaaaap:" + position);
-//        Log.e(TAG, "taaaaaaaaaaaaaaap:" + position);
-//        Log.e(TAG, "taaaaaaaaaaaaaaap:" + position);
-////        startDrag();
-//    }
-
-
-//    /**
-//     * リスト要素長押しイベント処理
-//     */
-//    @Override
-//    public boolean onItemLongClick(AdapterView<?> parent, View view,
-//                                   int position, long id) {
-//        return startDrag();
-//    }
-
     /**
      * ACTION_DOWN 時の MotionEvent をプロパティに格納
      */
@@ -325,16 +299,10 @@ public class SortableListView extends ListView {
         mLayoutParams.y = rawY - 32;
     }
 
-    /**
-     * ドラッグイベントリスナのセット
-     */
     public void setDragListener(DragListener listener) {
         mDragListener = listener;
     }
 
-    /**
-     * ソートモードのセット
-     */
     public void setSortable(boolean sortable) {
         mSortable = sortable;
     }

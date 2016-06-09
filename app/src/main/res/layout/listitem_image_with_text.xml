@@ -46,7 +46,7 @@
 
     <!-- ソートボタン -->
     <ImageView
-        android:id="@+id/sort_button"
+        android:id="@+id/sort_button_image"
         style="@style/list_arrow"
         android:layout_width="50dp"
         android:layout_height="50dp"

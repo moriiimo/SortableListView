@@ -4,13 +4,10 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.util.LruCache;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.ImageLoader;
@@ -42,10 +39,10 @@ public class MainActivity extends AppCompatActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mAdapter = new SampleAdapter(getLayoutInflater(), PREFS, mDraggingPosition, getImageLoader(), new SortButtonClickListener());
+        mAdapter = new SampleAdapter(getLayoutInflater(), PREFS, mDraggingPosition
+                , getImageLoader(), new SortButtonImageClickListener());
         mListView = (SortableListView) findViewById(R.id.list);
         mListView.init(new DragListener(), mAdapter);
-//        mListView.setOnTouchListener(new SortButtonClickListener());
     }
 
     @Override
@@ -60,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         mListView.setSortable(!mListView.getSortable());
         // アダプタ側に編集モードの通知（ボタン出したりとか）
-        mAdapter.setEditMode(mListView.getSortable());
+        mAdapter.setSortable(mListView.getSortable());
         mListView.invalidateViews();
         return super.onOptionsItemSelected(item);
     }
@@ -88,10 +85,9 @@ public class MainActivity extends AppCompatActivity {
         return mImageLoader;
     }
 
-    private class SortButtonClickListener implements View.OnTouchListener {
+    private class SortButtonImageClickListener implements View.OnTouchListener {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            Log.e(TAG, "aaaaaaaaaaaaaaaa");
             mListView.setSortButtonImageTouched(true);
             return false;
         }
@@ -101,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public int onStartDrag(int position) {
             mDraggingPosition = position;
-            mAdapter.updateDraggingPosition(mDraggingPosition);
+            mAdapter.setDraggingPosition(mDraggingPosition);
             mListView.invalidateViews();
             return position;
         }
@@ -133,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
                 PREFS[min] = data;
             }
             mDraggingPosition = positionTo;
-            mAdapter.updateDraggingPosition(mDraggingPosition);
+            mAdapter.setDraggingPosition(mDraggingPosition);
             mListView.invalidateViews();
             return positionTo;
         }
@@ -141,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         public boolean onStopDrag(int positionFrom, int positionTo) {
             mDraggingPosition = -1;
-            mAdapter.updateDraggingPosition(mDraggingPosition);
+            mAdapter.setDraggingPosition(mDraggingPosition);
             mListView.invalidateViews();
             return positionFrom != positionTo && positionFrom >= 0
                     || positionTo >= 0;
