@@ -6,12 +6,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.PixelFormat;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
@@ -55,8 +53,6 @@ public class SortableListView extends ListView {
     }
 
     public void init(DragListener listener, ListAdapter adapter) {
-//        setOnItemLongClickListener(this);
-//        setOnItemClickListener(this);
         setDragListener(listener);
         setAdapter(adapter);
     }
@@ -71,8 +67,12 @@ public class SortableListView extends ListView {
         }
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {
-                Log.e(TAG, "action down " + event.getX() + ":" + event.getY());
                 storeMotionEvent(event);
+                // ImageView 用の LayoutParams が未設定の場合は設定する
+                // 初期化付近でやると、表示するビューの位置がずれるのでドラッグイベント開始前に設定
+                if (mLayoutParams == null) {
+                    initLayoutParams();
+                }
                 startDrag();
                 break;
             }
@@ -83,7 +83,6 @@ public class SortableListView extends ListView {
                 break;
             }
             case MotionEvent.ACTION_UP: {
-                Log.e(TAG, "action_up");
                 if (stopDrag(event, true)) {
                     return true;
                 }
@@ -109,55 +108,31 @@ public class SortableListView extends ListView {
     /**
      * ドラッグ開始
      */
-    private boolean startDrag() {
+    private void startDrag() {
         // イベントから position を取得
         mPositionFrom = eventToPosition(mActionDownEvent);
-        Log.e(TAG, String.valueOf(mPositionFrom));
 
         // 取得した position が 0未満＝範囲外の場合はドラッグを開始しない
         if (mPositionFrom < 0) {
-            return false;
+            return;
         }
 
         // タップした位置がボタン画像のあたりではない場合はドラッグ中と判定しない
         if (!mSortButtonImageTouched) {
-            return false;
+            return;
         }
 
         mDragging = true;
 
-        // View, Canvas, WindowManager の取得・生成
-        final View view = getChildByIndex(mPositionFrom);
-        final Canvas canvas = new Canvas();
-        final WindowManager wm = getWindowManager();
-
-        // ドラッグ対象要素の View を Canvas に描画
-        mDragBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),
-                DRAG_BITMAP_CONFIG);
-        canvas.setBitmap(mDragBitmap);
-        view.draw(canvas);
-
-        // 前回使用した ImageView が残っている場合は除去（念のため？）
-        if (mDragImageView != null) {
-            wm.removeView(mDragImageView);
-        }
-
-        // ImageView 用の LayoutParams が未設定の場合は設定する
-        if (mLayoutParams == null) {
-            initLayoutParams();
-        }
-
-        // ImageView を生成し WindowManager に addChild する
-        mDragImageView = new ImageView(getContext());
-        mDragImageView.setBackgroundColor(mBitmapBackgroundColor);
-        mDragImageView.setImageBitmap(mDragBitmap);
-        wm.addView(mDragImageView, mLayoutParams);
+        // ソート時に使う画像を生成
+        createSortCellImage();
 
         // ドラッグ開始
         if (mDragListener != null) {
             mPositionFrom = mDragListener.onStartDrag(mPositionFrom);
         }
-        return duringDrag(mActionDownEvent);
+
+        duringDrag(mActionDownEvent);
     }
 
     /**
@@ -193,8 +168,7 @@ public class SortableListView extends ListView {
             // 横方向はとりあえず考えない
             int middlePosition = pointToPosition(0, middle);
             if (middlePosition == AdapterView.INVALID_POSITION) {
-                middlePosition = pointToPosition(0, middle + getDividerHeight()
-                        + 64);
+                middlePosition = pointToPosition(0, middle + getDividerHeight());
             }
             final View middleView = getChildByIndex(middlePosition);
             if (middleView != null) {
@@ -208,11 +182,12 @@ public class SortableListView extends ListView {
         } else {
             mDragImageView.setVisibility(View.VISIBLE);
         }
-        updateLayoutParams((int) event.getRawY()); // ここだけスクリーン座標を使う
+//        updateLayoutParams((int) event.getRawY()); // ここだけスクリーン座標を使う
+        updateLayoutParams((int) event.getY()); // スクリーン座標やめてタッチした座標に吸い付くようにしてみる
         getWindowManager().updateViewLayout(mDragImageView, mLayoutParams);
         if (mDragListener != null) {
             mPositionFrom = mDragListener.onDuringDrag(mPositionFrom,
-                    pointToPosition(x, y + 100));
+                    pointToPosition(x, y));
         }
         return true;
     }
@@ -236,20 +211,46 @@ public class SortableListView extends ListView {
         mDragging = false;
 
         if (mDragImageView != null) {
-            getWindowManager().removeView(mDragImageView);
-            mDragImageView = null;
-            // リサイクルするとたまに死ぬけどタイミング分からない by vvakame
-            if (mDragBitmap != null) {
-                mDragBitmap.recycle();
-                mDragBitmap = null;
-            }
-
-            mActionDownEvent.recycle();
-            mActionDownEvent = null;
+            removeSortCellImage();
+            removeMotionEvent();
             return true;
         }
 
         return false;
+    }
+
+    private void createSortCellImage() {
+        // View, Canvas, WindowManager の取得・生成
+        final View view = getChildByIndex(mPositionFrom);
+        final Canvas canvas = new Canvas();
+
+        // ドラッグ対象要素の View を Canvas に描画
+        mDragBitmap = Bitmap.createBitmap(view.getWidth(), view.getHeight(),
+                DRAG_BITMAP_CONFIG);
+        canvas.setBitmap(mDragBitmap);
+        view.draw(canvas);
+
+        // ImageView を生成し WindowManager に addChild する
+        mDragImageView = new ImageView(getContext());
+        mDragImageView.setBackgroundColor(mBitmapBackgroundColor);
+        mDragImageView.setImageBitmap(mDragBitmap);
+        getWindowManager().addView(mDragImageView, mLayoutParams);
+    }
+
+    private void removeSortCellImage() {
+        getWindowManager().removeView(mDragImageView);
+//        mDragImageView.setImageDrawable(null); これ書くともたつく‥
+        mDragImageView = null;
+
+        if (mDragBitmap != null) {
+            mDragBitmap.recycle();
+            mDragBitmap = null;
+        }
+    }
+
+    private void removeMotionEvent() {
+        mActionDownEvent.recycle();
+        mActionDownEvent = null;
     }
 
     /**
@@ -296,7 +297,7 @@ public class SortableListView extends ListView {
      * ImageView 用 LayoutParams の座標情報を更新
      */
     private void updateLayoutParams(int rawY) {
-        mLayoutParams.y = rawY - 32;
+        mLayoutParams.y = rawY;
     }
 
     public void setDragListener(DragListener listener) {

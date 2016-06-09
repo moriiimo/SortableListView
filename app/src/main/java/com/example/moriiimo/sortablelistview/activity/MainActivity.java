@@ -56,7 +56,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         mListView.setSortable(!mListView.getSortable());
-        // アダプタ側に編集モードの通知（ボタン出したりとか）
         mAdapter.setSortable(mListView.getSortable());
         mListView.invalidateViews();
         return super.onOptionsItemSelected(item);
